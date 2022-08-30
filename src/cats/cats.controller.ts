@@ -10,11 +10,17 @@ import {
   Res,
   Param,
   Body,
+  ForbiddenException,
+  UseFilters,
+  ParseIntPipe,
   HttpStatus,
 } from '@nestjs/common';
+import { CustomExceptionFilter } from 'src/Exceptions/exceptionFilter';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/createCat.dto';
 
+// to apply custom exception filter at controller level
+// @UseFilters(new CustomExceptionFilter())
 @Controller('cats')
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
@@ -74,14 +80,24 @@ export class CatsController {
       },
     ];
   }
+  @UseFilters(CustomExceptionFilter)
+  @Get(':custom-exception-filter')
+  @HttpCode(200)
+  getCatCustomFilter(): string {
+    throw new ForbiddenException('you are forbidden from accessing this route');
+  }
 
   @Get(':id')
   @HttpCode(200)
   getCat(
-    @Param() params,
-    // @Param('id') id: string,
+    // @Param() params,
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: string,
   ): string {
-    return "getting the cats with different iD's " + params.id;
+    return "getting the cats with different iD's " + id;
   }
 
   @Post()
