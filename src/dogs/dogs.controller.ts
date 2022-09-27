@@ -3,11 +3,11 @@ import {
   Get,
   HttpCode,
   Param,
+  ParseIntPipe,
   Post,
-  HttpException,
-  HttpStatus,
 } from '@nestjs/common';
 import { DogsService } from './dogs.service';
+import { ForbiddenException } from '@nestjs/common';
 
 @Controller('dogs')
 export class DogsController {
@@ -27,22 +27,23 @@ export class DogsController {
 
   @Get('check-error-filters')
   async findAll() {
-    throw new HttpException(
-      {
-        status: HttpStatus.FORBIDDEN,
-        error: 'This is a custom message.',
-      },
-      HttpStatus.FORBIDDEN,
-    );
+    //this will send the message 'unidentified' with error and status defined in the Class
+    throw new ForbiddenException('unidentified');
+
+    //this will send the message unidentified with error 'contact admin' and status defined in the Class
+    // throw new ForbiddenException('unidentified', 'contact admin');
+
+    //this will send status and error defined in the Class
+    // throw new ForbiddenException();
   }
 
   @Get(':id')
   @HttpCode(200)
   getDog(
-    @Param() params,
-    // @Param('id') id: string,
+    // @Param() params,
+    @Param('id', ParseIntPipe) id: string,
   ): object {
-    return { message: 'getting the dog with ID ' + params.id, status: 200 };
+    return { message: 'getting the dog with ID ' + id, status: 200 };
   }
 
   @Post()
