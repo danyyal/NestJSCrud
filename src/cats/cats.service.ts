@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-
+import { Injectable, HttpStatus } from '@nestjs/common';
+import { CreateCatDto } from './dto/createCat.dto';
 @Injectable()
 export class CatsService {
   meow(): string {
@@ -7,5 +7,12 @@ export class CatsService {
   }
   sleep(): string {
     return 'sleeping';
+  }
+  createCat(catObj: CreateCatDto) {
+    return {
+      ...catObj,
+      status: HttpStatus.CREATED,
+      message: 'successfully created',
+    };
   }
 }

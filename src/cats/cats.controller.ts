@@ -18,9 +18,20 @@ import {
 import { CustomExceptionFilter } from 'src/Exceptions/exceptionFilter';
 import { CatsService } from './cats.service';
 import { CreateCatDto } from './dto/createCat.dto';
-
+// import Joi from 'joi';
 // to apply custom exception filter at controller level
 // @UseFilters(new CustomExceptionFilter())
+
+// export const catSchema = Joi?.object().keys({
+//   name: Joi.string().required(),
+//   age: Joi.number().required(),
+//   breed: Joi.string().required(),
+// });
+
+// .options({
+//   // ignore the extra keys and attributes when set to true
+//   abortEarly: true,
+// });
 @Controller('cats')
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
@@ -95,7 +106,7 @@ export class CatsController {
       'id',
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
-    id: string,
+    id: number,
   ): string {
     return "getting the cats with different iD's " + id;
   }
@@ -108,10 +119,9 @@ export class CatsController {
 
   @Post('new-cat')
   @HttpCode(201)
-  createCat(
-    @Body() createCatDto: CreateCatDto,
-    @Res() response: Response,
-  ): string {
-    return this.catsService.sleep();
+  // @UsePipes(new createCatValidationPipe(catSchema))
+  async createCat(@Body() catObj: CreateCatDto): Promise<object> {
+    const responseData = await this.catsService.createCat(catObj);
+    return responseData;
   }
 }
