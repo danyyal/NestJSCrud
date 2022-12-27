@@ -1,6 +1,6 @@
 import { IsString, IsInt, IsNotEmpty } from 'class-validator';
 
-export class CreateCatDto {
+export class CatDto {
   @IsString()
   @IsNotEmpty()
   name: string;
@@ -11,5 +11,11 @@ export class CreateCatDto {
 
   @IsString()
   @IsNotEmpty()
+  breed: string;
+}
+
+export class UpdateCatDto {
+  name: string;
+  age: number;
   breed: string;
 }

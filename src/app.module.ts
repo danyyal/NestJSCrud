@@ -5,9 +5,29 @@ import { AppService, TestService } from './app.service';
 import { CatModule } from './cats/cats.module';
 import { DogModule } from './dogs/dogs.module';
 import { CustomExceptionFilter } from './Exceptions/exceptionFilter';
-
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import entities from './typeorm/entities';
 @Module({
-  imports: [CatModule, DogModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('DB_HOST'),
+        port: +configService.get<number>('DB_PORT'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('DB_NAME'),
+        entities: entities,
+        synchronize: true,
+      }),
+      inject: [ConfigService],
+    }),
+    CatModule,
+    DogModule,
+  ],
   controllers: [AppController],
   providers: [
     // { provide: APP_FILTER, useClass: CustomExceptionFilter },

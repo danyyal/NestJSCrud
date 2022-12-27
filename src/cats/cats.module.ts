@@ -8,10 +8,13 @@ import { CatsController } from './cats.controller';
 import { LoggerMiddleware } from 'src/Middlewares/LoggerMiddleware';
 import { CatsService } from './cats.service';
 import { createCatMiddleware } from '../Middlewares/cats/createCatMiddleware';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { Cat } from 'src/typeorm/entities';
 // what does global do ?
 // @Global()
 
 @Module({
+  imports: [TypeOrmModule.forFeature([Cat])],
   controllers: [CatsController],
   providers: [CatsService],
 })

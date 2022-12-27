@@ -5,7 +5,6 @@ import { Request, Response, NextFunction } from 'express';
 export class createCatMiddleware implements NestMiddleware {
   use(req: Request, res: Response, next: NextFunction) {
     console.log(req.body, 'req');
-    req.body.name = 'dan';
     next();
   }
 }

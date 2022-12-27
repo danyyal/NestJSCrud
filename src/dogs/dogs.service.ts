@@ -1,7 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationShutdown } from '@nestjs/common';
 
 @Injectable()
-export class DogsService {
+export class DogsService implements OnApplicationShutdown {
+  onApplicationShutdown(signal?: string) {
+    console.log(signal, 'from dogs service');
+  }
   bark(): string {
     return 'barking';
   }

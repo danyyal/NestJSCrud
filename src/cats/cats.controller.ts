@@ -14,30 +14,37 @@ import {
   UseFilters,
   ParseIntPipe,
   HttpStatus,
+  Patch,
+  Delete,
+  UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CustomExceptionFilter } from 'src/Exceptions/exceptionFilter';
+import { RolesGuard } from 'src/Guards/RolesGuard';
+import { LoggingInterceptor } from 'src/Interceptors/LoggingInterceptor';
 import { CatsService } from './cats.service';
-import { CreateCatDto } from './dto/createCat.dto';
+import { CatDto } from './dto/createCat.dto';
 // import Joi from 'joi';
 // to apply custom exception filter at controller level
 // @UseFilters(new CustomExceptionFilter())
 
-// export const catSchema = Joi?.object().keys({
-//   name: Joi.string().required(),
-//   age: Joi.number().required(),
-//   breed: Joi.string().required(),
-// });
-
-// .options({
-//   // ignore the extra keys and attributes when set to true
-//   abortEarly: true,
-// });
+// export const catSchema = Joi?.object()
+//   .keys({
+//     name: Joi.string().required(),
+//     age: Joi.number().required(),
+//     breed: Joi.string().required(),
+//   })
+//   .options({
+//     // ignore the extra keys and attributes when set to true
+//     abortEarly: true,
+//   });
 @Controller('cats')
+@UseGuards(RolesGuard)
+@UseInterceptors(LoggingInterceptor)
 export class CatsController {
   constructor(private readonly catsService: CatsService) {}
 
   // @ is decorator
-
   @Get('meow')
   @HttpCode(200)
   getMeow(
@@ -59,7 +66,7 @@ export class CatsController {
 
   @Get('all')
   @HttpCode(200)
-  async getCats(
+  async gettepmCats(
     @Req() request: Request,
     // @Res() response: Response,
   ): Promise<any[]> {
@@ -97,8 +104,14 @@ export class CatsController {
   getCatCustomFilter(): string {
     throw new ForbiddenException('you are forbidden from accessing this route');
   }
+  @Get('get-cats')
+  @HttpCode(201)
+  async getCats(): Promise<any> {
+    const result = await this.catsService.getCats();
+    return result;
+  }
 
-  @Get(':id')
+  @Get('get-cat/:id')
   @HttpCode(200)
   getCat(
     // @Param() params,
@@ -107,8 +120,8 @@ export class CatsController {
       new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
     )
     id: number,
-  ): string {
-    return "getting the cats with different iD's " + id;
+  ): any {
+    return this.catsService.getCatById(id);
   }
 
   @Post()
@@ -120,8 +133,31 @@ export class CatsController {
   @Post('new-cat')
   @HttpCode(201)
   // @UsePipes(new createCatValidationPipe(catSchema))
-  async createCat(@Body() catObj: CreateCatDto): Promise<object> {
-    const responseData = await this.catsService.createCat(catObj);
-    return responseData;
+  createCat(@Body() catObj: CatDto): any {
+    return this.catsService.createCat(catObj);
+  }
+
+  @Patch('update-cat/:id')
+  @HttpCode(201)
+  updateCat(
+    @Body() catObj,
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ): any {
+    return this.catsService.updateCat(catObj, id);
+  }
+
+  @Delete('delete-cat/:id')
+  deleteCat(
+    @Param(
+      'id',
+      new ParseIntPipe({ errorHttpStatusCode: HttpStatus.NOT_ACCEPTABLE }),
+    )
+    id: number,
+  ): any {
+    return this.catsService.deleteCat(id);
   }
 }
