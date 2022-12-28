@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  BeforeApplicationShutdown,
+  Module,
+  OnApplicationBootstrap,
+  OnApplicationShutdown,
+} from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService, TestService } from './app.service';
@@ -35,4 +40,19 @@ import entities from './typeorm/entities';
     TestService,
   ],
 })
-export class AppModule {}
+export class AppModule
+  implements
+    OnApplicationBootstrap,
+    OnApplicationShutdown,
+    BeforeApplicationShutdown
+{
+  onApplicationBootstrap() {
+    console.log('Application has been started');
+  }
+  beforeApplicationShutdown(signal?: string) {
+    console.log('going to shut down application');
+  }
+  onApplicationShutdown(signal?: string) {
+    console.log('application has been shutdown ');
+  }
+}

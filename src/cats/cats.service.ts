@@ -1,12 +1,20 @@
-import { Injectable, HttpStatus, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  HttpStatus,
+  OnModuleInit,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cat } from 'src/typeorm/entities';
 import { Repository } from 'typeorm';
 import { CatDto, UpdateCatDto } from './dto/createCat.dto';
 @Injectable()
-export class CatsService implements OnModuleInit {
+export class CatsService implements OnModuleInit, OnModuleDestroy {
   onModuleInit() {
-    console.log('Cats Module has been initalized');
+    console.log('Cats Module has been initalized.');
+  }
+  onModuleDestroy() {
+    console.log('Cats module has been destroyed.');
   }
   // onModuleDestroy() {
   //   console.log('module destroyed');
